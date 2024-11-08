@@ -1,33 +1,42 @@
-const User = require("../../models/User.js");
+const { Op } = require("sequelize");
+const Show = require("../../models/Show.js");
 /* const { Op } = require("sequelize"); */
 const express = require("express");
-const usersRouter = express.Router();
+const showsRouter = express.Router();
 
-usersRouter.get("/", async (request, response) => {
-	response.json(await User.findAll());
+showsRouter.get("/", async (request, response) => {
+	response.json(await Show.findAll());
 });
 
-usersRouter.get("/:userid", async (request, response) => {
-	/*response.json(await User.findAll({
-		where: {
-			id: {
-				[Op.eq]: Number(request.params.userid),
-			}
-		}
-	}));*/
-	response.json(await User.findByPk(request.params.userid));
+showsRouter.get("/:userid", async (request, response) => {
+	response.json(await Show.findByPk(request.params.userid));
 });
 
-usersRouter.get("/:userid/shows", async (request, response) => {
-	const targetUser = await User.findByPk(request.params.userid);
-	response.json(await targetUser.getWatched());	
+showsRouter.get("/:showid/shows", async (request, response) => {
+	const targetShow = await Show.findByPk(request.params.showid);
+	response.json(await targetShow.getUsers());
 });
 
-usersRouter.put("/:userid/shows/:movieid", async (request, response) => {
-	const targetUser = await User.findByPk(request.params.userid);
-	response.json (await targetUser.createWatched({
-		userId: request.params.userid
+showsRouter.put("/:showid/:available", async (request, response) => {
+	const targetShow = await Show.findByPk(request.params.showid);
+	response.json(await targetShow.update({
+		available: request.params.available === "true" ? true : false
 	}));
 });
 
-module.exports = usersRouter;
+showsRouter.delete("/:showid", async (request, response) => {
+	const targetShow = await Show.findByPk(request.params.showid);
+	response.json(targetShow.destroy());
+});
+
+showsRouter.get("/genre/:genre", async (request, response) => {
+	response.json(await Show.findAll({
+		where: {
+			genre: {
+				[Op.eq]: request.params.genre,
+			}
+		}
+	}));
+});
+
+module.exports = showsRouter;

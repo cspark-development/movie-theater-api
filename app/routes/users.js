@@ -8,25 +8,19 @@ usersRouter.get("/", async (request, response) => {
 });
 
 usersRouter.get("/:userid", async (request, response) => {
-	/*response.json(await User.findAll({
-		where: {
-			id: {
-				[Op.eq]: Number(request.params.userid),
-			}
-		}
-	}));*/
 	response.json(await User.findByPk(request.params.userid));
 });
 
 usersRouter.get("/:userid/shows", async (request, response) => {
 	const targetUser = await User.findByPk(request.params.userid);
-	response.json(await targetUser.getWatched());	
+	response.json(await targetUser.getWatched());
 });
 
-usersRouter.put("/:userid/shows/:movieid", async (request, response) => {
+usersRouter.put("/:userid/shows/:showid", async (request, response) => {
 	const targetUser = await User.findByPk(request.params.userid);
 	response.json (await targetUser.createWatched({
-		userId: request.params.userid
+		userId: request.params.userid,
+		showId: request.params.showid
 	}));
 });
 
